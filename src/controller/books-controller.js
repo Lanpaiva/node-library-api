@@ -2,7 +2,9 @@ import books from "../models/Book.js";
 
 class BookController {
     static listBooks = (req, res) => {
-        books.find((err, books) => {
+        books.find()
+        .populate('author')
+        .exec((err, books) => {
             res.status(200).json(books)
         })
     }
@@ -10,7 +12,9 @@ class BookController {
     static listById = (req, res) => {
         const id = req.params.id
 
-        books.findById(id, (err, books) => {
+        books.findById(id)
+          .populate('author', 'name') 
+        .exec((err, books) => {
             if (err) {
                 res.status(400).send({message: `${err.message} - id not found`})
             } else {
@@ -52,6 +56,14 @@ class BookController {
         } else {
             res.status(200).send({message: `book at position id: ${id} deleted from library`})
         }
+    })
+   }
+
+   static listbyPublish = (req, res) => {
+    const publish = req.query.publish
+
+    books.find({'publish': publish}, {}, (err, books) => {
+        res.status(200).send(books)
     })
    }
 }
